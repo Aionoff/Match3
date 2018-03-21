@@ -3,7 +3,13 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - square_purple
+  - square_blue
+  - square_green
+  - square_orange
+  - square_red
+  - square_yellow
   layers:
   - Default
   - TransparentFX

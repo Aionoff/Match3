@@ -6,11 +6,10 @@ public class Board : MonoBehaviour {
     public int widthBoard;
     public int hightBoard;
     public GameObject[] tilePrefabs;
-
-    private BackgroundTile[,] tiles;
+    public GameObject[,] tiles;
     
 	void Start () {
-        tiles = new BackgroundTile[widthBoard, hightBoard];
+        tiles = new GameObject[widthBoard, hightBoard];
         SetUp();
 	}
 	
@@ -23,7 +22,10 @@ public class Board : MonoBehaviour {
                 var position = new Vector2(i, j);
                 var tile = Instantiate(GetRandomTile(), position, Quaternion.identity);
                 tile.transform.parent = this.transform;
-                tile.name = "[" + i + ", " + j + "]";
+                tile.name = "[i = " + i + ", j = " + j + "]";
+                tiles[i, j] = tile;
+                tiles[i, j].GetComponent<Dot>().targetY = j;
+                tiles[i, j].GetComponent<Dot>().targetX = i;
             }
         }
     }
