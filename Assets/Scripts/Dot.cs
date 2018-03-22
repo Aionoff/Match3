@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Dot : MonoBehaviour {
+    [Header("Board variables")]
     public int column;
     public int row;
     public int targetX;
     public int targetY;
     public bool isMatched;
+    public int previousColumn;
+    public int previousRow;
 
     private float swipeAngle = 0;
     private Vector2 firstPosition;
@@ -19,12 +22,13 @@ public class Dot : MonoBehaviour {
     // Use this for initialization
     void Start () {
         board = FindObjectOfType<Board>();
-
-        //targetX = (int)transform.position.x;
-        //targetY = (int)transform.position.y;
-
+        isMatched = false;
+        targetX = (int)transform.position.x;
+        targetY = (int)transform.position.y;
         row = targetY;
         column = targetX;
+        previousColumn = column;
+        previousRow = row;
     }
 	
 	void Update () {
@@ -39,7 +43,8 @@ public class Dot : MonoBehaviour {
         targetX = column;
         targetY = row;
 
-        if(Mathf.Abs(targetX - transform.position.x) > .1)
+
+        if (Mathf.Abs(targetX - transform.position.x) > .1)
         {
             tempPosition = new Vector2(targetX, transform.position.y);
             transform.position = Vector2.Lerp(transform.position, tempPosition, .4f);
@@ -66,6 +71,27 @@ public class Dot : MonoBehaviour {
         }
     }
 
+    public IEnumerator CheckMove()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        if (otherDot != null)
+        {
+            if (!otherDot.GetComponent<Dot>().isMatched && !isMatched)
+            {
+                otherDot.GetComponent<Dot>().row = row;
+                otherDot.GetComponent<Dot>().column = column;
+
+                row = previousRow;
+                column = previousColumn;
+
+                Debug.Log("row: " + row + "; col: " + column + " prRow: " + previousRow + "prCol: " + previousColumn);
+            }
+
+            otherDot = null;
+        }
+    }
+
     void OnMouseDown()
     {
         firstPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -86,7 +112,7 @@ public class Dot : MonoBehaviour {
 
     private void Move()
     {
-        if (board.widthBoard > column && swipeAngle > -45 && swipeAngle <= 45)
+        if (board.widthBoard - 1 > column && swipeAngle > -45 && swipeAngle <= 45)
         {
             //move right
             otherDot = board.tiles[column + 1, row];
@@ -94,7 +120,7 @@ public class Dot : MonoBehaviour {
             column++;
             Debug.Log("right");
         }
-        else if (board.hightBoard > row && swipeAngle > 45 && swipeAngle <= 135)
+        else if (board.hightBoard - 1 > row && swipeAngle > 45 && swipeAngle <= 135)
         {
             //move up
             otherDot = board.tiles[column, row + 1];
@@ -118,6 +144,8 @@ public class Dot : MonoBehaviour {
             row--;
             Debug.Log("Down");
         }
+
+        StartCoroutine(CheckMove());
     }
 
     void FindMatches()
